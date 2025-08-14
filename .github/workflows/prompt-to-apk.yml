@@ -7,12 +7,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
+
+      # Rozbalí zip projektu, pokud je v repozitáři
+      - name: Unzip starter project if present
+        run: |
+          if ls *.zip >/dev/null 2>&1; then
+            unzip -o "*.zip" -d .
+          fi
+
+      # Stáhne a spustí Gradle bez wrapperu
       - name: Build debug APK
-        run: ./gradlew assembleDebug
+        uses: gradle/gradle-build-action@v3
+        with:
+          gradle-version: 8.7
+          arguments: :app:assembleDebug
+
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
